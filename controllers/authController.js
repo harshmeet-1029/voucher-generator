@@ -1,7 +1,7 @@
 exports.login = (req, res) => {
   const { username, password } = req.body;
   // Hardcoded for demonstration; replace with database check
-  if (username === "admin" && password === "admin") {
+  if (username === "a" && password === "a") {
     req.session.user = { username }; // Store user info in session
     return res.redirect("/dashboard"); // Redirect to dashboard after login
   }

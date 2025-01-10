@@ -1,0 +1,46 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.container {
+  margin-top: 30px;
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.qr-button:hover {
+  background-color: #0a6bd3;
+  color: #e9e9e9;
+}
+
+.vouchers-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.vouchers-list li {
+  border-bottom: 1px solid #dee2e6;
+  padding: 10px 0;
+}
+
+.header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 15px 20px;
+}
+
+.header a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.header a:hover {
+  text-decoration: underline;
+}
