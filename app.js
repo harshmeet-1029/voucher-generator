@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const { connectDB } = require("./config/db");
 const authRoutes = require("./routes/auth");
 const dashboardRoutes = require("./routes/dashboard");
+const settingsRoutes = require("./routes/settings");
 const isAuthenticated = require("./middleware/auth");
-// const settingsRoutes = require("./routes/settings");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +29,7 @@ connectDB();
 // Routes
 app.use("/", authRoutes);
 app.use("/dashboard", isAuthenticated, dashboardRoutes);
-// app.use('/settings', settingsRoutes);
+app.use("/settings", isAuthenticated, settingsRoutes);
 app.use("*", (req, res) => {
   res.status(404).render("404");
 });

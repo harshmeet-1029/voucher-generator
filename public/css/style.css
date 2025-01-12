@@ -23,6 +23,8 @@ body {
 .vouchers-list {
   max-height: 300px;
   overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.175);
+  border-radius: 0.53rem;
 }
 
 .vouchers-list li {
@@ -30,6 +32,9 @@ body {
   padding: 10px 0;
 }
 
+.vouchers-list-group {
+  border: 0px;
+}
 .header {
   background-color: #007bff;
   color: #fff;
