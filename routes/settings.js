@@ -12,8 +12,7 @@ router.get("/", async (req, res) => {
     settings = result.recordset[0];
   }
 
-  console.log(settings);
-  res.render("settings", { settings, message: null, error: false });
+  res.render("settings", { settings, message: null, error: null });
 });
 
 // Route to get settings
@@ -31,6 +30,9 @@ router.post("/update", async (req, res) => {
   // Validate the inputs and build an error message if needed
   if (maxExpiryDays < 1) {
     errorMessage += "Max Expiry Days must be at least 1. ";
+  }
+  if (maxExpiryDays >= 100) {
+    errorMessage += "Max Expiry Days must not be greater than 100. ";
   }
   if (voucherWidth < 10) {
     errorMessage += "Voucher Width must be at least 10mm. ";
@@ -57,7 +59,6 @@ router.post("/update", async (req, res) => {
     // Save the settings to the database
     await sql.query`UPDATE settings SET maxExpiryDays = ${maxExpiryDays}, voucherWidth = ${voucherWidth}, voucherHeight = ${voucherHeight}, titleFontSize = ${titleFontSize}, normalFontSize = ${normalFontSize}`;
 
-    res.redirect("/dashboard");
     // Send confirmation message along with updated data
     res.render("settings", {
       settings: {

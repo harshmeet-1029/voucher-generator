@@ -1,5 +1,21 @@
 body {
+  font-family: "Roboto", sans-serif;
   background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background-color: #6200ea !important;
+}
+
+.navbar-brand,
+.nav-link {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: #bb86fc !important;
 }
 
 .container {
@@ -7,45 +23,86 @@ body {
 }
 
 .card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.styled-card-body {
+  padding-top: 0px;
+}
+
+.btn {
+  border-radius: 8px;
+}
+
+.btn:hover {
+  opacity: 0.9;
 }
 
 .qr-button {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #6200ea;
+  color: white;
 }
 
 .qr-button:hover {
-  background-color: #0a6bd3;
-  color: #e9e9e9;
+  background-color: #3700b3;
+  color: rgba(255, 255, 255, 0.848);
+}
+
+.toast-container .toast {
+  background-color: #f44336;
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .vouchers-list {
-  max-height: 300px;
+  max-height: calc(100vh - 285px);
   overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.175);
-  border-radius: 0.53rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 20px;
 }
 
-.vouchers-list li {
-  border-bottom: 1px solid #dee2e6;
-  padding: 10px 0;
+.vouchers-list .table {
+  margin-bottom: 0;
 }
 
-.vouchers-list-group {
-  border: 0px;
-}
-.header {
-  background-color: #007bff;
-  color: #fff;
-  padding: 15px 20px;
+.vouchers-list th,
+.vouchers-list td {
+  text-align: center;
 }
 
-.header a {
-  color: #fff;
-  text-decoration: none;
+.table-bordered {
+  border-color: #dee2e6;
 }
 
-.header a:hover {
-  text-decoration: underline;
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+.table-primary {
+  background-color: #f8f9fa;
+}
+
+.voucher-actions {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .voucher-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    align-items: stretch; /* Ensures buttons take full width */
+  }
+  .voucher-actions .btn {
+    width: 100%; /* Ensures buttons are full width on smaller screens */
+    font-size: clamp(0.8rem, 2vw, 1rem);
+  }
 }

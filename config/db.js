@@ -11,9 +11,9 @@ const config = {
     trustServerCertificate: true,
     trustedConnection: false,
     enableArithAbort: true,
-    instancename: "SQLEXPRESS",
+    instancename: process.env.DB_INSTANCE || "SQLEXPRESS",
   },
-  port: 1433,
+  port: process.env.DB_PORT || 1433,
 };
 
 async function connectDB() {

@@ -67,18 +67,24 @@ router.post("/generate", async (req, res) => {
 router.get("/print-voucher/:code", async (req, res) => {
   const { code } = req.params;
   if (!code) {
-    return res.status(400).send("Voucher code is required.");
+    return res.status(400).render("error", {
+      message: "Voucher code is required.",
+    });
   }
 
   try {
     const result = await sql.query`SELECT * FROM vouchers WHERE code = ${code}`;
     if (!result || result.recordset.length === 0) {
-      return res.status(404).send("Voucher not found.");
+      return res.status(404).render("error", {
+        message: "Voucher not found.",
+      });
     }
 
     const settings = await getSettings();
     if (!settings) {
-      return res.status(500).send("Failed to retrieve settings.");
+      return res.status(500).render("error", {
+        message: "Failed to retrieve settings.",
+      });
     }
 
     const voucher = result.recordset[0];
@@ -90,17 +96,25 @@ router.get("/print-voucher/:code", async (req, res) => {
         true
       );
       if (!printResult) {
-        return res.status(500).send("Error generating PDF.");
+        return res.status(500).render("error", {
+          message: "Error generating PDF.",
+        });
       }
 
       res.json(printResult);
     } catch (pdfError) {
       console.error("Error generating voucher PDF:", pdfError);
-      res.status(500).send("Error generating voucher PDF.");
+      return res.status(500).render("error", {
+        message: "Error generating voucher PDF.",
+        error: pdfError.message,
+      });
     }
   } catch (dbError) {
     console.error("Error fetching voucher for printing:", dbError);
-    res.status(500).send("Error fetching voucher for printing.");
+    return res.status(500).render("error", {
+      message: "An error occurred while fetching vouchers.",
+      error: dbError.message,
+    });
   }
 });
 
@@ -113,14 +127,18 @@ router.get("/export-pdf/:code", async (req, res) => {
 
     if (result && result.recordset.length > 0) {
       const voucher = result.recordset[0];
-
       await generateVoucherPDF(voucher, settings, res);
     } else {
-      res.status(404).send("Voucher not found.");
+      return res.status(404).render("error", {
+        message: "Voucher not found.",
+      });
     }
   } catch (error) {
     console.error("Error exporting voucher as PDF:", error);
-    res.status(500).send("Error exporting voucher.");
+    return res.status(500).render("error", {
+      message: "Error exporting voucher.",
+      error: error.message,
+    });
   }
 });
 

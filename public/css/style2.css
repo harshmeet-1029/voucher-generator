@@ -1,0 +1,77 @@
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background-color: #6200ea !important;
+}
+
+.navbar-brand,
+.nav-link {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: #bb86fc !important;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #6200ea !important;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3700b3 !important;
+}
+
+.btn-secondary {
+  background-color: #00000067;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5100c4;
+}
+
+.text-success {
+  color: #03dac6 !important;
+}
+
+img {
+  border: 2px solid #6200ea;
+  border-radius: 8px;
+}
+
+.VoucherButtons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.VoucherTitle {
+  color: #53a756;
+}
+@media (max-width: 768px) {
+  .VoucherTitle {
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+  }
+
+  .VoucherButtons {
+    flex-direction: column;
+    align-items: stretch; /* Ensures buttons take full width */
+  }
+
+  .VoucherButtons .btn {
+    width: 100%; /* Ensures buttons are full width on smaller screens */
+    margin-bottom: 10px; /* Adds spacing between buttons */
+  }
+}
