@@ -98,7 +98,3 @@ The application will run on `http://localhost:3000` by default.
 ## Contact
 
 For inquiries or support, contact [harshmeetsingh010@gmail.com](mailto:harshmeetsingh010@gmail.com).
-
-```
-Feel free to adjust project-specific details like the repository URL, your email, or additional features.
-```
