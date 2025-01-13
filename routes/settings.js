@@ -43,8 +43,10 @@ router.post("/update", async (req, res) => {
   if (maxExpiryDays < 1) {
     errorMessage += "Max Expiry Days must be at least 1. ";
   }
-  if (maxExpiryDays > 100) {
-    errorMessage += "Max Expiry Days must not be greater than 100. ";
+  const maxDaysIn100Years = 100 * 365.25; // 100 years in days
+
+  if (maxExpiryDays > maxDaysIn100Years) {
+    errorMessage += "Max Expiry Days must not be greater than 100 years. ";
   }
   if (voucherWidth < 10) {
     errorMessage += "Voucher Width must be at least 10mm. ";

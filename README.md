@@ -63,7 +63,7 @@ Make sure you have the following installed:
    DB_USER = 'yourDatabaseUsername'
    DB_PASSWORD = 'yourDatabasePassword'
    DB_SERVER = 'yourServerName'
-   DB_NAME = 'yourDatabaseName'
+   DB_NAME = 'Vouchers'  # Default database name (can be changed to your custom DB name)
    ```
 
    Replace the placeholders with your actual configuration values.
@@ -72,7 +72,7 @@ Make sure you have the following installed:
 
    - Ensure SQL Server is running and properly configured.
    - Open the `SQLQuery.sql` file located in the project root.
-   - Execute the script in SQL Server Management Studio (or any SQL client) to create the required tables
+   - Execute the script in SQL Server Management Studio (or any SQL client) to create the required database and tables
 
 ---
 
