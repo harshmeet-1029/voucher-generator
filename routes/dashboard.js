@@ -20,71 +20,109 @@ router.get("/", async (req, res) => {
       }));
 
       formattedVouchers.reverse();
-      return res.render("dashboard", { vouchers: formattedVouchers });
+
+      return res.render("dashboard", {
+        vouchers: formattedVouchers,
+        message: req.query.error || null, // Show error message if exists
+        error: req.query.error ? true : false,
+      });
     } else {
       return res.render("dashboard", {
         vouchers: [],
         message: "No vouchers found.",
+        error: true,
       });
     }
   } catch (error) {
     console.error("Error fetching vouchers:", error);
-    return res.status(500).render("error", {
+    return res.render("dashboard", {
+      vouchers: [],
       message: "An error occurred while fetching vouchers.",
-      error,
+      error: true,
     });
   }
 });
 
 router.post("/generate", async (req, res) => {
-  const randomCode = Math.floor(
-    1000000000 + Math.random() * 9000000000
-  ).toString();
-  const generatedDate = new Date();
-  const settings = await getSettings();
-  const expiryDate = new Date(generatedDate);
-  expiryDate.setDate(expiryDate.getDate() + settings.maxExpiryDays); // Use maxExpiryDays from settings
+  try {
+    const randomCode = Math.floor(
+      1000000000 + Math.random() * 9000000000
+    ).toString();
+    const generatedDate = new Date();
+    const settings = await getSettings();
 
-  const formattedGeneratedDate = dayjs(generatedDate).format(
-    "DD-MMM-YYYY hh:mm A"
-  );
-  const formattedExpiryDate = dayjs(expiryDate).format("DD-MMM-YYYY hh:mm A");
+    if (!settings || !settings.maxExpiryDays) {
+      throw new Error("Settings not found or invalid expiry days.");
+    }
 
-  await sql.query`INSERT INTO vouchers (code, generated_date, expiry_date) VALUES (${randomCode}, ${generatedDate}, ${expiryDate})`;
+    const expiryDate = new Date(generatedDate);
+    expiryDate.setDate(expiryDate.getDate() + settings.maxExpiryDays); // Use maxExpiryDays from settings
 
-  QRCode.toDataURL(randomCode, (err, url) => {
-    if (err) return res.send("Error generating QR Code");
-    res.render("voucher", {
-      qrCode: url,
-      code: randomCode,
-      generatedDate: formattedGeneratedDate,
-      expiryDate: formattedExpiryDate,
+    const formattedGeneratedDate = dayjs(generatedDate).format(
+      "DD-MMM-YYYY hh:mm A"
+    );
+    const formattedExpiryDate = dayjs(expiryDate).format("DD-MMM-YYYY hh:mm A");
+
+    await sql.query`INSERT INTO vouchers (code, generated_date, expiry_date) VALUES (${randomCode}, ${generatedDate}, ${expiryDate})`;
+
+    QRCode.toDataURL(randomCode, (err, url) => {
+      try {
+        if (err) {
+          throw new Error("Error generating QR code");
+        }
+        res.render("voucher", {
+          qrCode: url,
+          code: randomCode,
+          generatedDate: formattedGeneratedDate,
+          expiryDate: formattedExpiryDate,
+        });
+      } catch (error) {
+        // If any error occurs, render the dashboard with error message and without inserting voucher data
+        return res.redirect(
+          `/dashboard?error=${encodeURIComponent(
+            error.message || "An error occurred while generating voucher."
+          )}`
+        );
+      }
     });
-  });
+  } catch (error) {
+    // If any error occurs, render the dashboard with error message and without inserting voucher data
+    return res.redirect(
+      `/dashboard?error=${encodeURIComponent(
+        error.message || "An error occurred while generating voucher."
+      )}`
+    );
+  }
 });
 
 // Your print voucher route
 router.get("/print-voucher/:code", async (req, res) => {
   const { code } = req.params;
   if (!code) {
-    return res.status(400).render("error", {
-      message: "Voucher code is required.",
-    });
+    return res.redirect(
+      `/dashboard?error=${encodeURIComponent(
+        "An error occurred while printing vouchers."
+      )}`
+    );
   }
 
   try {
     const result = await sql.query`SELECT * FROM vouchers WHERE code = ${code}`;
     if (!result || result.recordset.length === 0) {
-      return res.status(404).render("error", {
-        message: "Voucher not found.",
-      });
+      return res.redirect(
+        `/dashboard?error=${encodeURIComponent(
+          "An error occurred while printing vouchers."
+        )}`
+      );
     }
 
     const settings = await getSettings();
     if (!settings) {
-      return res.status(500).render("error", {
-        message: "Failed to retrieve settings.",
-      });
+      return res.redirect(
+        `/dashboard?error=${encodeURIComponent(
+          "An error occurred while printing vouchers."
+        )}`
+      );
     }
 
     const voucher = result.recordset[0];
@@ -96,25 +134,29 @@ router.get("/print-voucher/:code", async (req, res) => {
         true
       );
       if (!printResult) {
-        return res.status(500).render("error", {
-          message: "Error generating PDF.",
-        });
+        return res.redirect(
+          `/dashboard?error=${encodeURIComponent(
+            "An error occurred while printing vouchers."
+          )}`
+        );
       }
 
       res.json(printResult);
     } catch (pdfError) {
       console.error("Error generating voucher PDF:", pdfError);
-      return res.status(500).render("error", {
-        message: "Error generating voucher PDF.",
-        error: pdfError.message,
-      });
+      return res.redirect(
+        `/dashboard?error=${encodeURIComponent(
+          "An error occurred while printing vouchers."
+        )}`
+      );
     }
   } catch (dbError) {
     console.error("Error fetching voucher for printing:", dbError);
-    return res.status(500).render("error", {
-      message: "An error occurred while fetching vouchers.",
-      error: dbError.message,
-    });
+    return res.redirect(
+      `/dashboard?error=${encodeURIComponent(
+        "An error occurred while printing vouchers."
+      )}`
+    );
   }
 });
 
@@ -125,20 +167,32 @@ router.get("/export-pdf/:code", async (req, res) => {
     const result = await sql.query`SELECT * FROM vouchers WHERE code = ${code}`;
     const settings = await getSettings(); // Fetch settings
 
+    if (!settings) {
+      return res.redirect(
+        `/dashboard?error=${encodeURIComponent(
+          "An error occurred while exporting vouchers."
+        )}`
+      );
+    }
+
     if (result && result.recordset.length > 0) {
       const voucher = result.recordset[0];
       await generateVoucherPDF(voucher, settings, res);
     } else {
-      return res.status(404).render("error", {
-        message: "Voucher not found.",
-      });
+      // Voucher not found
+      return res.redirect(
+        `/dashboard?error=${encodeURIComponent("Voucher not found.")}`
+      );
     }
   } catch (error) {
     console.error("Error exporting voucher as PDF:", error);
-    return res.status(500).render("error", {
-      message: "Error exporting voucher.",
-      error: error.message,
-    });
+
+    // Handle error and redirect to dashboard with error message
+    return res.redirect(
+      `/dashboard?error=${encodeURIComponent(
+        "An error occurred while exporting vouchers."
+      )}`
+    );
   }
 });
 

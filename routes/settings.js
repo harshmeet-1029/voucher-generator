@@ -3,16 +3,29 @@ const router = express.Router();
 const { sql } = require("../config/db");
 
 router.get("/", async (req, res) => {
-  // Fetch settings from the database or use default values
-  let settings = {};
+  try {
+    // Initialize settings as an empty object
+    let settings = {};
 
-  // You can fetch these values from the database if you have a settings table
-  const result = await sql.query`SELECT * FROM settings`;
-  if (result.recordset.length > 0) {
-    settings = result.recordset[0];
+    // Fetch settings from the database
+    const result = await sql.query`SELECT * FROM settings`;
+
+    if (result.recordset.length > 0) {
+      settings = result.recordset[0];
+    }
+
+    // Render the settings page with the fetched settings
+    res.render("settings", { settings, message: null, error: null });
+  } catch (error) {
+    console.error("Error fetching settings:", error);
+
+    // Render the settings page with an error message
+    res.render("settings", {
+      settings: {},
+      message: "An error occurred while fetching settings.",
+      error: true,
+    });
   }
-
-  res.render("settings", { settings, message: null, error: null });
 });
 
 // Route to get settings

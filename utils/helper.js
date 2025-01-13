@@ -17,12 +17,9 @@ module.exports.generateVoucherPDF = (voucher, settings, res, print = false) => {
       if (err) return reject("Error generating QR Code");
 
       const doc = new PDFDocument({
-        size: [settings.voucherWidth, settings.voucherHeight], // Set dimensions
+        size: [settings?.voucherWidth || 500, settings?.voucherHeight || 300], // Set dimensions
         margin: 20, // Add margin to make content look better
       });
-
-      // Prepare the file name
-      const fileName = `Voucher_${voucher.code}.pdf`;
 
       const buffers = [];
       doc.on("data", buffers.push.bind(buffers));
@@ -49,10 +46,17 @@ module.exports.generateVoucherPDF = (voucher, settings, res, print = false) => {
       });
 
       // Add border to make it look like a voucher
-      doc.rect(0, 0, settings.voucherWidth, settings.voucherHeight).stroke();
+      doc
+        .rect(
+          0,
+          0,
+          settings?.voucherWidth || 500,
+          settings?.voucherHeight || 300
+        )
+        .stroke();
 
       // Header
-      doc.fontSize(settings.titleFontSize).text("Voucher Details", {
+      doc.fontSize(settings?.titleFontSize || 15).text("Voucher Details", {
         align: "center",
         underline: true, // Add underline to the header
       });
@@ -60,7 +64,7 @@ module.exports.generateVoucherPDF = (voucher, settings, res, print = false) => {
 
       // Voucher Details Section
       doc
-        .fontSize(settings.normalFontSize)
+        .fontSize(settings?.normalFontSize || 10)
         .text(`Code: ${voucher.code}`, { align: "left" });
       doc.text(`Generated Date: ${formattedGeneratedDate}`, {
         align: "left",
@@ -71,7 +75,7 @@ module.exports.generateVoucherPDF = (voucher, settings, res, print = false) => {
       // Divider line
       doc
         .moveTo(20, doc.y)
-        .lineTo(settings.voucherWidth - 20, doc.y)
+        .lineTo((settings?.voucherWidth || 500) - 20, doc.y)
         .stroke();
 
       // QR Code Section
@@ -81,7 +85,7 @@ module.exports.generateVoucherPDF = (voucher, settings, res, print = false) => {
       const qrCodeSize = 150; // Size of the QR code (150x150 pixels)
 
       // Calculate the x position to center the QR code
-      const xPosition = (settings.voucherWidth - qrCodeSize) / 2;
+      const xPosition = ((settings?.voucherWidth || 500) - qrCodeSize) / 2;
 
       // Create the QR code buffer
       const qrCodeBuffer = Buffer.from(qrCodeUrl.split(",")[1], "base64");
@@ -103,10 +107,10 @@ module.exports.getSettings = async () => {
   return (
     result.recordset[0] || {
       maxExpiryDays: 30,
-      voucherWidth: 210,
-      voucherHeight: 99,
-      titleFontSize: 25,
-      normalFontSize: 16,
+      voucherWidth: 500,
+      voucherHeight: 300,
+      titleFontSize: 15,
+      normalFontSize: 10,
     }
   );
 };

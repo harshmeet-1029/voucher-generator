@@ -17,7 +17,7 @@ app.use(
     secret: process.env.SESSION_SECRET, // Ensure this is a string
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Set to true if using HTTPS
+    cookie: { secure: false }, // Set to true using HTTPS
   })
 );
 app.set("view engine", "ejs");

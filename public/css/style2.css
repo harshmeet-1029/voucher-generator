@@ -60,6 +60,10 @@ img {
 .VoucherTitle {
   color: #53a756;
 }
+.toast-close:hover {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .VoucherTitle {
     font-size: clamp(1.2rem, 5vw, 1.5rem);

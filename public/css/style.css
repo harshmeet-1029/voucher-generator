@@ -94,6 +94,10 @@ body {
   justify-content: center;
 }
 
+.toast-close:hover {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .voucher-actions {
     flex-direction: column;
