@@ -13,7 +13,6 @@ router.get("/", async (req, res) => {
     if (result.recordset.length > 0) {
       settings = result.recordset[0];
     }
-
     // Render the settings page with the fetched settings
     res.render("settings", { settings, message: null, error: null });
   } catch (error) {
@@ -44,7 +43,7 @@ router.post("/update", async (req, res) => {
   if (maxExpiryDays < 1) {
     errorMessage += "Max Expiry Days must be at least 1. ";
   }
-  if (maxExpiryDays >= 100) {
+  if (maxExpiryDays > 100) {
     errorMessage += "Max Expiry Days must not be greater than 100. ";
   }
   if (voucherWidth < 10) {
@@ -69,21 +68,51 @@ router.post("/update", async (req, res) => {
   }
 
   try {
-    // Save the settings to the database
-    await sql.query`UPDATE settings SET maxExpiryDays = ${maxExpiryDays}, voucherWidth = ${voucherWidth}, voucherHeight = ${voucherHeight}, titleFontSize = ${titleFontSize}, normalFontSize = ${normalFontSize}`;
+    // Check if the settings table has any row
+    const existingSettings =
+      await sql.query`SELECT COUNT(*) AS count FROM settings`;
+    const settingsCount = existingSettings.recordset[0].count;
 
-    // Send confirmation message along with updated data
-    res.render("settings", {
-      settings: {
-        maxExpiryDays,
-        voucherWidth,
-        voucherHeight,
-        titleFontSize,
-        normalFontSize,
-      },
-      message: "Settings updated successfully!",
-      error: false,
-    });
+    if (settingsCount === 0) {
+      // Insert new settings if the table is empty
+      const insertResult = await sql.query`
+         INSERT INTO settings (maxExpiryDays, voucherWidth, voucherHeight, titleFontSize, normalFontSize)
+         VALUES (${maxExpiryDays}, ${voucherWidth}, ${voucherHeight}, ${titleFontSize}, ${normalFontSize})`;
+
+      res.render("settings", {
+        settings: {
+          maxExpiryDays,
+          voucherWidth,
+          voucherHeight,
+          titleFontSize,
+          normalFontSize,
+        },
+        message: "Settings saved successfully!",
+        error: false,
+      });
+    } else {
+      // Update existing settings if a row already exists
+      const updateResult = await sql.query`
+         UPDATE settings 
+         SET 
+           maxExpiryDays = ${maxExpiryDays}, 
+           voucherWidth = ${voucherWidth}, 
+           voucherHeight = ${voucherHeight}, 
+           titleFontSize = ${titleFontSize}, 
+           normalFontSize = ${normalFontSize}`;
+
+      res.render("settings", {
+        settings: {
+          maxExpiryDays,
+          voucherWidth,
+          voucherHeight,
+          titleFontSize,
+          normalFontSize,
+        },
+        message: "Settings updated successfully!",
+        error: false,
+      });
+    }
   } catch (error) {
     console.error("Error updating settings:", error);
     res.render("settings", {
